@@ -41,8 +41,8 @@ Date: 3 Apr 2015
 		<div id="table" class="columns handsontable"></div>
 
 		<div class="columns" ng-app="plateApp" ng-controller="plateCtrl">		
-			<div class="column" ng-repeat="strain in strains" id="strain.id">
-				<input class="input-strain" type="text" ng-model="strain.name" style="background:#{{strain.color}}" onchange="javascript:datatable.render()">
+			<div class="column" ng-repeat="(name, color) in strains">
+				<input class="input-strain" type="text" value="{{ name }}" style="background:{{ color }}" onchange="javascript:datatable.render()">
 			</div>
 			<div class="column">
 				<a class="btn" href="javascript:prepareDownload()" role="button"><span class="octicon octicon-arrow-down"></span></a>
@@ -66,12 +66,10 @@ Date: 3 Apr 2015
 	</div>
 	<!-- Angular -->
 	<script>
-	var pal = palette('cb-Set1', 9);
-	pal.unshift('ffffff');
-	var strains = Array();
-	pal.forEach(function(c,i) {
-		var obj = {id: i, name: i.toString(), color: c};  		
-		strains.push(obj);
+	var pal = palette('cb-Set1', 9);	
+	var strains = {'0': '#ffffff'};
+	pal.forEach(function(c,i) {		
+		strains[(i+1).toString()] = '#' + c;
 	})
 	var app = angular.module('plateApp', []);
 	app.controller('plateCtrl', function($scope) {
@@ -84,10 +82,10 @@ Date: 3 Apr 2015
 
 	colorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
 		Handsontable.renderers.TextRenderer.apply(this, arguments);		
-		var strainName = td.innerHTML;	
-		var strain = strains.filter(function(obj) {return obj.name == strainName; })[0];
-		if (strain) {
-			td.style.backgroundColor = '#'+strain.color;
+		var name = td.innerHTML;	
+		var color = strains[name.toString()];
+		if (color) {
+			td.style.backgroundColor = color;
 		} else {
 			td.style.backgroundColor = '#ffffff';
 		}
