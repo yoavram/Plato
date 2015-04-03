@@ -41,12 +41,11 @@ Date: 3 Apr 2015
 		<div id="table" class="columns handsontable"></div>
 
 		<div class="columns" ng-app="plateApp" ng-controller="plateCtrl">		
-			<div class="column" ng-repeat="(name, color) in strains">
+			<div class="column tooltipped tooltipped-s" ng-repeat="(name, color) in strains" aria-label="Change strain name">
 				<input class="input-strain" type="text" value="{{ name }}" style="background:{{ color }}" onchange="javascript:datatable.render()">
 			</div>
 			<div class="column">
-				<a class="btn" href="javascript:prepareDownload()" role="button"><span class="octicon octicon-arrow-down"></span></a>
-				<a id="btnDownload" class="btn btn-primary" download="plate.json" href="#" role="button" style="display: none" onclick="javascript:this.style.display='none'" ><span class="octicon octicon-arrow-down"></span></a>
+				<a class="btn btn-primary" href="javascript:download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>				
 			</div>
 		</div>
 	</div>
@@ -93,13 +92,13 @@ Date: 3 Apr 2015
 
 	var 
 	data = [[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0]];
+			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0]];
 
 	var container = document.getElementById('table');
 
@@ -112,17 +111,15 @@ Date: 3 Apr 2015
 		className: "htCenter",
 		renderer: colorRenderer    
 	});
-
-	function getBlob() {
+	</script>
+	<a id="btnDownload" download="plate.json" href="#" style="display: none"></a>
+	<script>
+	function download() {
 		var json = JSON.stringify(datatable.getData());
-		return URL.createObjectURL( new Blob([json], {type: "application/json"}) );
-	}
-
-	function prepareDownload() {
-		var url = getBlob();
+		var url = URL.createObjectURL( new Blob([json], {type: "application/json"}) );		
 		var btn = document.getElementById('btnDownload');
 		btn.href = url;
-		btn.style.display = '';
+		btn.click();
 	}
 	</script>
 </body>
