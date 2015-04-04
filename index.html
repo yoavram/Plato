@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<!-- 
+<!--
 Plate UI
 This little web app is used to design microplates and download them as a json.
 
@@ -9,25 +9,26 @@ Date: 3 Apr 2015
  -->
 <html lang="en">
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
 	<script src="https://cdn.rawgit.com/google/palette.js/master/palette.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.13.1/handsontable.full.min.js"></script>
+	<script src="https://cdn.rawgit.com/mholt/PapaParse/master/papaparse.min.js"></script>
 
 	<link rel="stylesheet" media="screen" href="https://cdn.rawgit.com/primer/primer/master/css/primer.css">
 	<link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.13.1/handsontable.full.min.css">
-	<link rel="stylesheet" media="screen" href="http://handsontable.com/demo/css/samples.css">	
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.2.2/octicons.css">
-	
+	<link rel="stylesheet" media="screen" href="http://handsontable.com/demo/css/samples.css">
+	<link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.2.2/octicons.css">
+
 	<style type="text/css">
-	body {	
+	body {
 		margin: 20px;
-	}	
+	}
 	.input-strain[type="text"] {
 		width: 2.5em;
 		height: 1.5em;
-		text-align: center;	
-		font-weight: bold;	
+		text-align: center;
+		font-weight: bold;
 		font-size: 110%;
 		padding: 0;
 	}
@@ -35,17 +36,17 @@ Date: 3 Apr 2015
 </head>
 <body>
 	<div class="container">
-		
+
 		<h1><span class="mega-octicon octicon-arrow-right"></span> Plate UI <span class="mega-octicon octicon-cloud-download"></span> </h1>
-		
+
 		<div id="table" class="columns handsontable"></div>
 
-		<div class="columns" ng-app="plateApp" ng-controller="plateCtrl">		
-			<div class="column tooltipped tooltipped-s" ng-repeat="(name, color) in strains" aria-label="Change strain name">
-				<input class="input-strain" type="text" value="{{ name }}" style="background:{{ color }}" onchange="javascript:datatable.render()">
+		<div class="columns" ng-app="plateApp" ng-controller="plateCtrl">
+			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
+				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="javascript:datatable.render()">
 			</div>
 			<div class="column">
-				<a class="btn btn-primary" href="javascript:download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>				
+				<a class="btn btn-primary" href="javascript:download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
 			</div>
 		</div>
 	</div>
@@ -65,24 +66,25 @@ Date: 3 Apr 2015
 	</div>
 	<!-- Angular -->
 	<script>
-	var pal = palette('cb-Set1', 9);	
-	var strains = {'0': '#ffffff'};
-	pal.forEach(function(c,i) {		
-		strains[(i+1).toString()] = '#' + c;
+	var pal = palette('cb-Set1', 9);
+	var strains = [{name: '0', color: '#ffffff'}];
+	pal.forEach(function(c,i) {
+		strains[strains.length] = {name: (i+1).toString(), color: '#' + c};
 	})
 	var app = angular.module('plateApp', []);
 	app.controller('plateCtrl', function($scope) {
-		$scope.strains = strains;			
-	});	
+		$scope.strains = strains;
+	});
 	</script>
 
 	<!-- Handsontable -->
 	<script>
 
 	colorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-		Handsontable.renderers.TextRenderer.apply(this, arguments);		
-		var name = td.innerHTML;	
-		var color = strains[name.toString()];
+		Handsontable.renderers.TextRenderer.apply(this, arguments);
+		var name = td.innerHTML;
+		var strain = strains.filter(function(obj) {return obj.name == name})[0];
+		var color = strain.color;
 		if (color) {
 			td.style.backgroundColor = color;
 		} else {
@@ -90,7 +92,7 @@ Date: 3 Apr 2015
 		}
 	};
 
-	var 
+	var
 	data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
 			["1","1","2","2","3","3","4","4","5","5","6","6"],
 			["1","1","2","2","3","3","4","4","5","5","6","6"],
@@ -99,7 +101,7 @@ Date: 3 Apr 2015
 			["1","1","2","2","3","3","4","4","5","5","6","6"],
 			["1","1","2","2","3","3","4","4","5","5","6","0"],
 			["1","1","2","2","3","3","4","4","5","5","6","0"]];
-	
+
 	var container = document.getElementById('table');
 
 	var datatable = new Handsontable(container, {
@@ -109,14 +111,24 @@ Date: 3 Apr 2015
 		maxRows : 8,
 		maxCols : 12,
 		className: "htCenter",
-		renderer: colorRenderer    
+		renderer: colorRenderer
 	});
 	</script>
-	<a id="btnDownload" download="plate.json" href="#" style="display: none"></a>
+	<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
 	<script>
 	function download() {
-		var json = JSON.stringify(datatable.getData());
-		var url = URL.createObjectURL( new Blob([json], {type: "application/json"}) );		
+		var dataframe = [];
+		data.forEach(function(row, i) {
+			row.forEach(function(value, j) {
+				dataframe[dataframe.length] = { row: datatable.getRowHeader(i),
+																	col: datatable.getColHeader(j),
+																	strain: value,
+																	color: strains.filter(function(obj) {return obj.name == value})[0].color
+																};
+			});
+		});
+		var csv = Papa.unparse(dataframe);
+		var url = URL.createObjectURL( new Blob([csv], {type: "text/csv"}) );
 		var btn = document.getElementById('btnDownload');
 		btn.href = url;
 		btn.click();
