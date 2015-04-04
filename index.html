@@ -46,16 +46,17 @@ Date: 3 Apr 2015
 
 		<div class="columns" >
 			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
-				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="javascript:datatable.render()">
+				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().datatable.render()">
 			</div>
 			<div class="column">
-				<a class="btn btn-primary" href="javascript:download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
+				<a class="btn btn-primary tooltipped tooltipped-e" href="angular.element(this).scope().download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
 			</div>
 		</div>
 		<div class="columns">
 			<div class="one-third column">
-				<input type="file" id="file" name="file">
-				<output id="list"></output>
+				<input type="file" id="file" name="file" ng-show="checkFileApi()" onchange="angular.element(this).scope().upload()">
+				<br>
+				<span ng-show="test">test</a>
 			</div>
 		</div>
 	</div>
@@ -73,103 +74,100 @@ Date: 3 Apr 2015
 		</div>
 	</div>
 	<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
-
 	<script>
-	// Angular
-
-	var pal = palette('cb-Set1', 9);
-	var strains = [{name: '0', color: '#ffffff'}];
-	pal.forEach(function(c,i) {
-		strains[strains.length] = {name: (i+1).toString(), color: '#' + c};
-	})
 	var app = angular.module('plateApp', []);
 	app.controller('plateCtrl', function($scope) {
-		$scope.strains = strains;
-	});
-
- 	// Handsontable
-
-	colorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-		Handsontable.renderers.TextRenderer.apply(this, arguments);
-		var name = td.innerHTML;
-		var strain = strains.filter(function(obj) {return obj.name == name})[0];
-		var color = strain.color;
-		if (color) {
-			td.style.backgroundColor = color;
-		} else {
-			td.style.backgroundColor = '#ffffff';
-		}
-	};
-
-	var
-	data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
-			["1","1","2","2","3","3","4","4","5","5","6","6"],
-			["1","1","2","2","3","3","4","4","5","5","6","6"],
-			["1","1","2","2","3","3","4","4","5","5","6","6"],
-			["1","1","2","2","3","3","4","4","5","5","6","6"],
-			["1","1","2","2","3","3","4","4","5","5","6","6"],
-			["1","1","2","2","3","3","4","4","5","5","6","0"],
-			["1","1","2","2","3","3","4","4","5","5","6","0"]];
-
-	var container = document.getElementById('table');
-
-	var datatable = new Handsontable(container, {
-		data: data,
-		colHeaders: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-		rowHeaders: ["A","B","C","D","E","F","G","H"],
-		maxRows : 8,
-		maxCols : 12,
-		className: "htCenter",
-		renderer: colorRenderer
-	});
-
-	// File
-
-	function download() {
-		var dataframe = [];
-		data.forEach(function(row, i) {
-			row.forEach(function(value, j) {
-				dataframe[dataframe.length] = { row: datatable.getRowHeader(i),
-																	col: datatable.getColHeader(j),
-																	strain: value,
-																	color: strains.filter(function(obj) {return obj.name == value})[0].color
-																};
+		$scope.pal = palette('cb-Set1', 9);
+		$scope.strains = [{name: '0', color: '#ffffff'}];
+		$scope.pal.forEach(function(c,i) {
+			$scope.strains[$scope.strains.length] = {name: (i+1).toString(), color: '#' + c};
+		})
+		$scope.upload = function () {
+			console.log('upload');
+			Papa.parse(window.event.target.files[0], {
+				header: true,
+				complete: function(results) {
+					$scope.strains = [];
+					results.data.forEach(function(row, i) {
+						var strain = {name: row["strain"], color: row["color"]};
+						if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
+							$scope.strains[$scope.strains.length] = strain;
+						}
+					});
+					$scope.$apply();
+					results.data.forEach(function(row, i) {
+						var tblSet = $scope.datatable.getSettings();
+						var i = tblSet.rowHeaders.indexOf(row["row"]);
+						var j = tblSet.colHeaders.indexOf(row["col"]);
+						$scope.datatable.setDataAtCell(i, j, row["strain"]);
+					});
+					$scope.$apply();
+				}
 			});
-		});
-		var csv = Papa.unparse(dataframe);
-		var url = URL.createObjectURL( new Blob([csv], {type: "text/csv"}) );
-		var btn = document.getElementById('btnDownload');
-		btn.href = url;
-		btn.click();
-	}
-	function checkFileApi() {
-		// Check for the various File API support.
-		if (window.File && window.FileReader && window.FileList && window.Blob) {
-		  return true;
-		} else {
-		  alert('The File APIs are not fully supported in this browser.');
-			return false;
 		}
-	}
-	function upload(evt) {
-		if (!checkFileApi()) {
-			return;
-		}
-		console.log("upload");
-		Papa.parse(evt.target.files[0], {
-			header: true,
-			complete: function(results) {
-				strains = [];
-				results.data.forEach(function(row, i) {
-					var strain = {name: row["strain"], color: row["color"]};
-					if (strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
-						strains[strains.length] = strain;
-					}
-				});
+		$scope.checkFileApi = function() {
+			// Check for the various File API support.
+			if (window.File && window.FileReader && window.FileList && window.Blob) {
+			  return true;
+			} else {
+			  alert('The File APIs are not fully supported in this browser.');
+				return false;
 			}
+		}
+
+		// Handsontable
+
+		$scope.colorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+			Handsontable.renderers.TextRenderer.apply(this, arguments);
+			var name = td.innerHTML;
+			var strain = $scope.strains.filter(function(obj) {return obj.name == name})[0];
+			var color = '#ffffff';
+			if (strain && strain.color) {
+				color = strain.color;
+			}
+			td.style.backgroundColor = color;
+		};
+
+		$scope.data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
+									["1","1","2","2","3","3","4","4","5","5","6","6"],
+									["1","1","2","2","3","3","4","4","5","5","6","6"],
+									["1","1","2","2","3","3","4","4","5","5","6","6"],
+									["1","1","2","2","3","3","4","4","5","5","6","6"],
+									["1","1","2","2","3","3","4","4","5","5","6","6"],
+									["1","1","2","2","3","3","4","4","5","5","6","0"],
+									["1","1","2","2","3","3","4","4","5","5","6","0"]];
+
+		var container = document.getElementById('table');
+
+		$scope.datatable = new Handsontable(container, {
+			data: $scope.data,
+			colHeaders: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+			rowHeaders: ["A","B","C","D","E","F","G","H"],
+			maxRows : 8,
+			maxCols : 12,
+			className: "htCenter",
+			renderer: $scope.colorRenderer
 		});
-	}
-	document.getElementById('file').addEventListener('change', upload, false);
+
+		$scope.download = function() {
+			var dataframe = [];
+			$scope.data.forEach(function(row, i) {
+				row.forEach(function(value, j) {
+					dataframe[dataframe.length] = { row: $scope.datatable.getRowHeader(i),
+																		col: $scope.datatable.getColHeader(j),
+																		strain: value,
+																		color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+																	};
+				});
+			});
+			var csv = Papa.unparse(dataframe);
+			var url = URL.createObjectURL( new Blob([csv], {type: "text/csv"}) );
+			var btn = document.getElementById('btnDownload');
+			btn.href = url;
+			btn.click();
+		}
+	});
+
 	</script>
 </body>
 </html>
