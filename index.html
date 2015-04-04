@@ -24,6 +24,9 @@ Date: 3 Apr 2015
 	body {
 		margin: 20px;
 	}
+	.columns {
+		margin-top: 20px;
+	}
 	.input-strain[type="text"] {
 		width: 2.5em;
 		height: 1.5em;
@@ -35,13 +38,13 @@ Date: 3 Apr 2015
 	</style>
 </head>
 <body>
-	<div class="container">
+	<div class="container" ng-app="plateApp" ng-controller="plateCtrl">
 
 		<h1><span class="mega-octicon octicon-arrow-right"></span> Plate UI <span class="mega-octicon octicon-cloud-download"></span> </h1>
 
 		<div id="table" class="columns handsontable"></div>
 
-		<div class="columns" ng-app="plateApp" ng-controller="plateCtrl">
+		<div class="columns" >
 			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
 				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="javascript:datatable.render()">
 			</div>
@@ -49,8 +52,13 @@ Date: 3 Apr 2015
 				<a class="btn btn-primary" href="javascript:download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
 			</div>
 		</div>
+		<div class="columns">
+			<div class="one-third column">
+				<input type="file" id="file" name="file">
+				<output id="list"></output>
+			</div>
+		</div>
 	</div>
-	<br><br>
 	<div class="columns">
 		<div class="one-third column">
 			&nbsp;
@@ -64,8 +72,11 @@ Date: 3 Apr 2015
 			&nbsp;
 		</div>
 	</div>
-	<!-- Angular -->
+	<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
+
 	<script>
+	// Angular
+
 	var pal = palette('cb-Set1', 9);
 	var strains = [{name: '0', color: '#ffffff'}];
 	pal.forEach(function(c,i) {
@@ -75,10 +86,8 @@ Date: 3 Apr 2015
 	app.controller('plateCtrl', function($scope) {
 		$scope.strains = strains;
 	});
-	</script>
 
-	<!-- Handsontable -->
-	<script>
+ 	// Handsontable
 
 	colorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
 		Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -113,9 +122,9 @@ Date: 3 Apr 2015
 		className: "htCenter",
 		renderer: colorRenderer
 	});
-	</script>
-	<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
-	<script>
+
+	// File
+
 	function download() {
 		var dataframe = [];
 		data.forEach(function(row, i) {
@@ -133,6 +142,34 @@ Date: 3 Apr 2015
 		btn.href = url;
 		btn.click();
 	}
+	function checkFileApi() {
+		// Check for the various File API support.
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+		  return true;
+		} else {
+		  alert('The File APIs are not fully supported in this browser.');
+			return false;
+		}
+	}
+	function upload(evt) {
+		if (!checkFileApi()) {
+			return;
+		}
+		console.log("upload");
+		Papa.parse(evt.target.files[0], {
+			header: true,
+			complete: function(results) {
+				strains = [];
+				results.data.forEach(function(row, i) {
+					var strain = {name: row["strain"], color: row["color"]};
+					if (strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
+						strains[strains.length] = strain;
+					}
+				});
+			}
+		});
+	}
+	document.getElementById('file').addEventListener('change', upload, false);
 	</script>
 </body>
 </html>
