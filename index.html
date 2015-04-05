@@ -14,7 +14,6 @@ Date: 3 Apr 2015
 	<script src="https://cdn.rawgit.com/google/palette.js/master/palette.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.13.1/handsontable.full.min.js"></script>
 	<script src="https://cdn.rawgit.com/mholt/PapaParse/master/papaparse.min.js"></script>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
 
 	<link rel="stylesheet" media="screen" href="https://cdn.rawgit.com/primer/primer/master/css/primer.css">
 	<link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.13.1/handsontable.full.min.css">
@@ -26,7 +25,7 @@ Date: 3 Apr 2015
 		margin: 20px;
 	}
 	.columns {
-		margin-top: 20px;
+		margin-top: 10px;
 	}
 	.input-strain[type="text"] {
 		width: 2.5em;
@@ -39,18 +38,24 @@ Date: 3 Apr 2015
 	</style>
 </head>
 <body>
-	<div class="container" ng-app="plateApp" ng-controller="plateCtrl" id="main">
+	<div class="container" ng-app="plateApp" ng-controller="plateCtrl" >
 
-		<h1><span class="mega-octicon octicon-arrow-right"></span> Plate UI <span class="mega-octicon octicon-cloud-download"></span> </h1>
+		<h1>
+			<span class="mega-octicon octicon-arrow-right"></span>
+			Plate UI
+			<span class="mega-octicon octicon-cloud-download"></span>
+			<span id="spinner" class="mega-octicon" ></span>
+		</h1>
+
 
 		<div id="table" class="columns handsontable"></div>
 
-		<div class="columns" >
+		<div class="columns">
 			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
 				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().datatable.render()">
 			</div>
 			<div class="column">
-				<a class="btn btn-primary tooltipped tooltipped-e" href="angular.element(this).scope().download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
+				<a class="btn btn-primary tooltipped tooltipped-e" href="" onclick="angular.element(this).scope().download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
 			</div>
 		</div>
 		<div class="columns">
@@ -65,53 +70,28 @@ Date: 3 Apr 2015
 		</div>
 		<div class="one-third column">
 			<h6><small>
-				<a href="https://gist.github.com/a71734f73c38f594fc90"><span class="octicon octicon-mark-github"></span></a> <a href="http://www.yoavram.com">yoavram</a>
+				<a href="https://github.com/yoavram/plato" target="_blank" >
+					<span class="octicon octicon-mark-github"></span>
+				</a>
+				<a href="http://www.yoavram.com" target="_blank">
+					yoavram
+				</a>
 			</small></h6>
-		</div>
-		<div class="one-third column">
-			&nbsp;
 		</div>
 	</div>
 	<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
+
 	<script>
 	var app = angular.module('plateApp', []);
 	app.controller('plateCtrl', function($scope) {
+
+		// Color palette
+
 		$scope.pal = palette('cb-Set1', 9);
 		$scope.strains = [{name: '0', color: '#ffffff'}];
 		$scope.pal.forEach(function(c,i) {
 			$scope.strains[$scope.strains.length] = {name: (i+1).toString(), color: '#' + c};
 		})
-		$scope.upload = function () {
-			spinner.spin(document.getElementById('main'));
-			Papa.parse(window.event.target.files[0], {
-				header: true,
-				complete: function(results) {
-					$scope.strains = [];
-					for (k = 0; k < results.data.length; k++) {
-						var row = results.data[k];
-						var strain = {name: row["strain"], color: row["color"]};
-						if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
-							$scope.strains[$scope.strains.length] = strain;
-						}
-						var tblSet = $scope.datatable.getSettings();
-						var i = tblSet.rowHeaders.indexOf(row["row"]);
-						var j = tblSet.colHeaders.indexOf(row["col"]);
-						$scope.datatable.setDataAtCell(i, j, row["strain"]);
-					}
-					$scope.$apply();
-					spinner.stop();
-				}
-			});
-		}
-		$scope.checkFileApi = function() {
-			// Check for the various File API support.
-			if (window.File && window.FileReader && window.FileList && window.Blob) {
-			  return true;
-			} else {
-			  alert('The File APIs are not fully supported in this browser.');
-				return false;
-			}
-		}
 
 		// Handsontable
 
@@ -147,6 +127,8 @@ Date: 3 Apr 2015
 			renderer: $scope.colorRenderer
 		});
 
+		// Files
+
 		$scope.download = function() {
 			var dataframe = [];
 			$scope.data.forEach(function(row, i) {
@@ -164,27 +146,51 @@ Date: 3 Apr 2015
 			btn.href = url;
 			btn.click();
 		}
-	});
 
-	var opts = {
-	      lines: 13, // The number of lines to draw
-	      length: 9, // The length of each line
-	      width: 10, // The line thickness
-	      radius: 25, // The radius of the inner circle
-	      corners: 1, // Corner roundness (0..1)
-	      rotate: 0, // The rotation offset
-	      direction: 1, // 1: clockwise, -1: counterclockwise
-	      color: '#6B9CC6', // #rgb or #rrggbb or array of colors
-	      speed: 1, // Rounds per second
-	      trail: 60, // Afterglow percentage
-	      shadow: false, // Whether to render a shadow
-	      hwaccel: false, // Whether to use hardware acceleration
-	      className: 'spinner', // The CSS class to assign to the spinner
-	      zIndex: 2e9, // The z-index (defaults to 2000000000)
-	      top: '50%', // Top position relative to parent
-	      left: '50%' // Left position relative to parent
-	  };
-	  var spinner = new Spinner(opts);
+		$scope.upload = function () {
+			spinner.spin(document.getElementById('spinner'));
+			Papa.parse(window.event.target.files[0], {
+				header: true,
+				complete: function(results) {
+					$scope.strains = [];
+					for (k = 0; k < results.data.length; k++) {
+						var row = results.data[k];
+						var strain = {name: row["strain"], color: row["color"]};
+						if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
+							$scope.strains[$scope.strains.length] = strain;
+						}
+						var tblSet = $scope.datatable.getSettings();
+						var i = tblSet.rowHeaders.indexOf(row["row"]);
+						var j = tblSet.colHeaders.indexOf(row["col"]);
+						$scope.datatable.setDataAtCell(i, j, row["strain"]);
+					}
+					$scope.$apply();
+					spinner.stop();
+				}
+			});
+		}
+
+		$scope.checkFileApi = function() {
+			// Check for the various File API support.
+			if (window.File && window.FileReader && window.FileList && window.Blob) {
+			  return true;
+			} else {
+			  alert('The File APIs are not fully supported in this browser.');
+				return false;
+			}
+		}
+	});
+	</script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
+	<script>
+		var spinnerOpts = {
+				radius: 15, // The radius of the inner circle
+				width: 5, // The line thickness
+				length: 15, // The length of each line
+			  top: '50%', // Top position relative to parent
+			  left: '50%' // Left position relative to parent
+		  };
+		  var spinner = new Spinner(spinnerOpts);
 	</script>
 </body>
 </html>
