@@ -22,10 +22,10 @@ Date: 3 Apr 2015
 
 	<style type="text/css">
 	body {
-		margin: 20px;
+		margin-top: 10px;
 	}
 	.columns {
-		margin-top: 10px;
+		margin: 10px;
 	}
 	.input-strain[type="text"] {
 		width: 2.5em;
@@ -35,11 +35,29 @@ Date: 3 Apr 2015
 		font-size: 110%;
 		padding: 0;
 	}
+	a:link, a:visited {
+		color: #333;
+	}
+	a:hover, button:hover, h1:hover, .input-strain[type="text"]:hover {
+		color: #6e5494;
+    text-decoration: none;
+		-webkit-transition: color 0.5s ease;
+		-moz-transition: color 0.5s ease;
+		-o-transition: color 0.5s ease;
+		transition: color 0.5s ease;
+	}
+	h1 {
+		margin-bottom: 10px;
+	}
+	h6 {
+		font-size: 10px
+	}
 	</style>
 </head>
 <body>
 	<div class="container" ng-app="plateApp" ng-controller="plateCtrl" >
 
+		<!-- Title -->
 		<h1>
 			<span class="mega-octicon octicon-arrow-right"></span>
 			Plate UI
@@ -47,41 +65,74 @@ Date: 3 Apr 2015
 			<span id="spinner" class="mega-octicon" ></span>
 		</h1>
 
+		<!-- Button -->
+		<div class="columns">
+			<div class="one-third column">
+				<div class="btn-group">
+					<button class="btn tooltipped tooltipped-w" type="button" onclick="angular.element(this).scope().download()" aria-label="Download plate file">
+						<span class="octicon octicon-arrow-down"></span>
+					</button>
+					<button class="btn tooltipped tooltipped-n"  type="button" ng-show="checkFileApi()" onclick="document.getElementById('upload-file').click();" aria-label="Upload plate file">
+						<span class="octicon octicon-arrow-up"></span>
+					</button>
+					<button class="btn tooltipped tooltipped-n" type="button" onclick="location.reload()" aria-label="Restart">
+						<span class="octicon octicon-sync"></span>
+					</button>
+					<a class="btn tooltipped tooltipped-e" target="_blank" role="button" href="http://i.imgur.com/5zPmGQf.gifv" aria-label="Drunk on fermented apples">
+						<span class="octicon octicon-squirrel"></span>
+					</a>
+				</div>
+			</div>
+		</div>
 
+		<!-- Table -->
 		<div id="table" class="columns handsontable"></div>
 
+		<!-- Color palette -->
 		<div class="columns">
 			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
 				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().datatable.render()">
 			</div>
+		</div>
+
+		<!-- Colophon -->
+		<div class="columns colophon">
 			<div class="column">
-				<a class="btn btn-primary tooltipped tooltipped-e" href="" onclick="angular.element(this).scope().download()" role="button" aria-label="Download plate file"><span class="octicon octicon-arrow-down"></span></a>
+				<h6>
+					<a href="https://github.com/yoavram/plato" target="_blank" >
+						<span class="octicon octicon-mark-github"></span>
+					</a>
+					<a href="http://www.yoavram.com" target="_blank">
+						yoavram
+					</a>
+				</h6>
 			</div>
 		</div>
-		<div class="columns">
-			<div class="one-third column">
-				<input type="file" id="file" name="file" ng-show="checkFileApi()" onchange="angular.element(this).scope().upload()">
-			</div>
-		</div>
+		<!-- Hidden controls -->
+		<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
+		<input type="file" id="upload-file" name="file" style="display: none" onchange="angular.element(this).scope().upload()">
 	</div>
-	<div class="columns">
-		<div class="one-third column">
-			&nbsp;
-		</div>
-		<div class="one-third column">
-			<h6><small>
-				<a href="https://github.com/yoavram/plato" target="_blank" >
-					<span class="octicon octicon-mark-github"></span>
-				</a>
-				<a href="http://www.yoavram.com" target="_blank">
-					yoavram
-				</a>
-			</small></h6>
-		</div>
-	</div>
-	<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
+
 
 	<script>
+	var data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
+								["1","1","2","2","3","3","4","4","5","5","6","6"],
+								["1","1","2","2","3","3","4","4","5","5","6","6"],
+								["1","1","2","2","3","3","4","4","5","5","6","6"],
+								["1","1","2","2","3","3","4","4","5","5","6","6"],
+								["1","1","2","2","3","3","4","4","5","5","6","6"],
+								["1","1","2","2","3","3","4","4","5","5","6","0"],
+								["1","1","2","2","3","3","4","4","5","5","6","0"]];
+	var checkerboard = [[0,0,0,0,0,0,0,0,0,0,0,0],
+											[1,2,1,2,1,2,1,2,1,2,1,2],
+											[2,1,2,1,2,1,2,1,2,1,2,1],
+											[1,2,1,2,1,2,1,2,1,2,1,2],
+											[2,1,2,1,2,1,2,1,2,1,2,1],
+											[1,2,1,2,1,2,1,2,1,2,1,2],
+											[2,1,2,1,2,1,2,1,2,1,2,1],
+											[1,2,1,2,1,2,1,2,1,2,1,2]];
+
+	// Angular
 	var app = angular.module('plateApp', []);
 	app.controller('plateCtrl', function($scope) {
 
@@ -106,19 +157,10 @@ Date: 3 Apr 2015
 			td.style.backgroundColor = color;
 		};
 
-		$scope.data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
-									["1","1","2","2","3","3","4","4","5","5","6","6"],
-									["1","1","2","2","3","3","4","4","5","5","6","6"],
-									["1","1","2","2","3","3","4","4","5","5","6","6"],
-									["1","1","2","2","3","3","4","4","5","5","6","6"],
-									["1","1","2","2","3","3","4","4","5","5","6","6"],
-									["1","1","2","2","3","3","4","4","5","5","6","0"],
-									["1","1","2","2","3","3","4","4","5","5","6","0"]];
-
 		var container = document.getElementById('table');
 
 		$scope.datatable = new Handsontable(container, {
-			data: $scope.data,
+			data: data,
 			colHeaders: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
 			rowHeaders: ["A","B","C","D","E","F","G","H"],
 			maxRows : 8,
@@ -131,13 +173,13 @@ Date: 3 Apr 2015
 
 		$scope.download = function() {
 			var dataframe = [];
-			$scope.data.forEach(function(row, i) {
+			data.forEach(function(row, i) {
 				row.forEach(function(value, j) {
 					dataframe[dataframe.length] = { row: $scope.datatable.getRowHeader(i),
-																		col: $scope.datatable.getColHeader(j),
-																		strain: value,
-																		color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
-																	};
+																					col: $scope.datatable.getColHeader(j),
+																					strain: value,
+																					color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+																				};
 				});
 			});
 			var csv = Papa.unparse(dataframe);
@@ -181,6 +223,7 @@ Date: 3 Apr 2015
 		}
 	});
 	</script>
+	<!-- Spinner -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
 	<script>
 		var spinnerOpts = {
