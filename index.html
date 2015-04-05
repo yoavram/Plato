@@ -38,7 +38,7 @@ Date: 3 Apr 2015
 	a:link, a:visited {
 		color: #333;
 	}
-	a:hover, button:hover, h1:hover, .input-strain[type="text"]:hover {
+	a:hover, button:hover, .input-strain[type="text"]:hover {
 		color: #6e5494;
     text-decoration: none;
 		-webkit-transition: color 0.5s ease;
@@ -56,13 +56,12 @@ Date: 3 Apr 2015
 </head>
 <body>
 	<div class="container" ng-app="plateApp" ng-controller="plateCtrl" >
+		<span id="spinner"></span>
 
 		<!-- Title -->
-		<h1>
-			<span class="mega-octicon octicon-arrow-right"></span>
-			Plate UI
-			<span class="mega-octicon octicon-cloud-download"></span>
-			<span id="spinner" class="mega-octicon" ></span>
+		<h1 class="left">
+			<img src="plato.png" class="avatar" align="bottom" style="text-align: left">
+			Plato
 		</h1>
 
 		<!-- Button -->
@@ -108,6 +107,7 @@ Date: 3 Apr 2015
 				</h6>
 			</div>
 		</div>
+
 		<!-- Hidden controls -->
 		<a id="btnDownload" download="plate.csv" href="#" style="display: none"></a>
 		<input type="file" id="upload-file" name="file" style="display: none" onchange="angular.element(this).scope().upload()">
