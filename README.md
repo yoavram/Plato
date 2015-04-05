@@ -1,4 +1,5 @@
 # Plato
+![Plato](https://raw.githubusercontent.com/yoavram/plato/master/plato.png)
 
 A tiny web app to design microplates and download them as a dataframe CSV.
 
