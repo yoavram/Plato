@@ -9,5 +9,7 @@ Open the app at <http://plato.yoavram.com/> or run locally by downloading `index
 ## License
 
 Author: Yoav Ram <yoavram@gmail.com>
-License: MIT
+
+License: CC-BY-SA 3.0
+
 Date: Apr 2015
