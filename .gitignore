@@ -1,0 +1,5 @@
+*.pyc
+*.exe
+venv
+.divshot-cache
+.git
