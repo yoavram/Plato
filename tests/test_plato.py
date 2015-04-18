@@ -1,13 +1,14 @@
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import requests
-import base64
-import urllib
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities    
 
 class PlatoTestCase(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Chrome()
+
+        d = DesiredCapabilities.CHROME
+        d['loggingPrefs'] = { 'browser':'ALL' }
+        self.driver = webdriver.Chrome(desired_capabilities=d)
         self.addCleanup(self.driver.quit)
         self.site_url = "http://plato.yoavram.com" # "file:///D:/workspace/curveball_project/plato/index.html" # 
 
@@ -35,7 +36,8 @@ class PlatoTestCase(unittest.TestCase):
         x.open('get', '%s');
         x.send();""" % href        
         driver.execute_script(script)
-
+        for entry in driver.get_log('browser'):
+            print entry['message']
         
 
     def tearDown(self):        
