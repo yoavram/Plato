@@ -22,23 +22,25 @@ class PlatoTestCase(unittest.TestCase):
     def test_download(self):
         driver = self.driver
         driver.get(self.site_url)
-        btn = self.driver.find_element_by_class_name('octicon-arrow-down')
+        btn = driver.find_element_by_class_name('octicon-arrow-down')
         assert btn != None
         btn.click()
-        btnDownload = self.driver.find_element_by_id('btnDownload')
-        assert btnDownload != None
-        href = btnDownload.get_attribute('href')
+        btn_download = self.driver.find_element_by_id('btnDownload')
+        assert btn_download != None
+        href = btn_download.get_attribute('href')
         
         script = """var x = new XMLHttpRequest();
         x.onload = function() {
-            console.log(x.responseText);
+            var div = document.createElement('div');
+            div.id = 'test';
+            div.textContent = x.responseText;
+            document.body.appendChild(div)            
         };
         x.open('get', '%s');
         x.send();""" % href        
         driver.execute_script(script)
-        for entry in driver.get_log('browser'):
-            print entry['message']
-        
+        test_div = driver.find_element_by_id('test')
+        print test_div.text
 
     def tearDown(self):        
         self.driver.close()
