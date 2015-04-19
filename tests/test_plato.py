@@ -30,7 +30,7 @@ class PlatoTestCase(unittest.TestCase):
         x.onload = function() {
             var div = document.createElement('div');
             div.id = 'test';
-            div.textContent = x.responseText;
+            div.innerText = x.responseText;
             document.body.appendChild(div)            
         };
         x.open('get', '%s');
@@ -38,6 +38,7 @@ class PlatoTestCase(unittest.TestCase):
         driver.execute_script(script)
         test_div = driver.find_element_by_id('test')
         print test_div.text
+
 
     def tearDown(self):        
         self.driver.close()
