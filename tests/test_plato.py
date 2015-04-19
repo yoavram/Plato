@@ -8,6 +8,9 @@ class PlatoTestCase(unittest.TestCase):
         self.driver = webdriver.Chrome()
         self.addCleanup(self.driver.quit)
         self.site_url = "http://plato.yoavram.com" # "file:///D:/workspace/curveball_project/plato/index.html" # 
+        with open("tests/plate.csv") as f:
+            self.plate_text = f.read()
+
 
     # def test_github_href(self):
     #     driver = self.browser        
@@ -15,6 +18,7 @@ class PlatoTestCase(unittest.TestCase):
     #     self.assertTrue("Plato" in driver.title)
     #     driver.find_element_by_name("github").click()
     #     self.assertTrue("github.com" in driver.page_source)
+        
         
     def test_download(self):
         driver = self.driver
@@ -37,7 +41,7 @@ class PlatoTestCase(unittest.TestCase):
         x.send();""" % href        
         driver.execute_script(script)
         test_div = driver.find_element_by_id('test')
-        print test_div.text
+        assert test_div.text == self.plate_text
 
 
     def tearDown(self):        
