@@ -118,13 +118,13 @@ URL: https://github.com/yoavram/plato
 
 	<script>
 	var data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","0"],
-								["1","1","2","2","3","3","4","4","5","5","6","0"]];
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","0"],
+				["1","1","2","2","3","3","4","4","5","5","6","0"]];
 
 	// Angular
 	var app = angular.module('plateApp', []);
@@ -170,14 +170,15 @@ URL: https://github.com/yoavram/plato
 			data.forEach(function(row, i) {
 				row.forEach(function(value, j) {
 					dataframe[dataframe.length] = { Row: $scope.datatable.getRowHeader(i),
-																					Col: $scope.datatable.getColHeader(j),
-																					Strain: value,
-																					Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
-																				};
+													Col: $scope.datatable.getColHeader(j),
+													Strain: value,
+													Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+												};
 				});
 			});
-			var csv = Papa.unparse(dataframe);
-			var url = URL.createObjectURL( new Blob([csv], {type: "text/csv"}) );
+			var csv = Papa.unparse(dataframe);			
+			var blob = new Blob([csv], {type: "text/csv"});
+			var url = URL.createObjectURL(blob);			
 			var btn = document.getElementById('btnDownload');
 			btn.href = url;
 			btn.click();
@@ -187,21 +188,26 @@ URL: https://github.com/yoavram/plato
 			spinner.spin(document.getElementById('spinner'));
 			Papa.parse(window.event.target.files[0], {
 				header: true,
-				complete: function(results) {
-					$scope.strains = [];
-					for (k = 0; k < results.data.length; k++) {
-						var row = results.data[k];
-						var strain = {name: row["Strain"], color: row["Color"]};
-						if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
-							$scope.strains[$scope.strains.length] = strain;
-						}
-						var tblSet = $scope.datatable.getSettings();
-						var i = tblSet.rowHeaders.indexOf(row["Row"]);
-						var j = tblSet.colHeaders.indexOf(row["Col"]);
-						$scope.datatable.setDataAtCell(i, j, row["Strain"]);
-					}
-					$scope.$apply();
-					spinner.stop();
+				complete: function(results, file) {					
+					$scope.$apply(function() {
+						$scope.strains = [];
+						for (k = 0; k < results.data.length; k++) {							
+							var row = results.data[k];
+							var strain = {name: row["Strain"], color: row["Color"]};
+							if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
+								$scope.strains[$scope.strains.length] = strain;
+							}
+							var tblSet = $scope.datatable.getSettings();
+							var i = tblSet.rowHeaders.indexOf(row["Row"]);
+							var j = tblSet.colHeaders.indexOf(row["Col"]);
+							$scope.datatable.setDataAtCell(i, j, row["Strain"]);
+						}					
+						spinner.stop();
+					});
+				},
+				error: function(error, file) {
+					console.log(error);
+					spinner.stop();	
 				}
 			});
 		}
