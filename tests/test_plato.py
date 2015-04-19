@@ -12,14 +12,14 @@ class PlatoTestCase(unittest.TestCase):
             self.plate_text = f.read()
 
 
-    # def test_github_href(self):
-    #     driver = self.browser        
-    #     driver.get(self.site_url)
-    #     self.assertTrue("Plato" in driver.title)
-    #     driver.find_element_by_name("github").click()
-    #     self.assertTrue("github.com" in driver.page_source)
+    def test_github_link(self):
+        driver = self.driver        
+        driver.get(self.site_url)
+        self.assertTrue("Plato" in driver.title)
+        driver.find_element_by_class_name("octicon-mark-github").click()
+        self.assertTrue("github.com" in driver.page_source)
         
-        
+
     def test_download(self):
         driver = self.driver
         driver.get(self.site_url)
