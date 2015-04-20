@@ -4,11 +4,42 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities    
+from sauceclient import SauceClient
 
+USERNAME = os.environ.get('SAUCE_USERNAME')
+ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
+sauce = SauceClient(USERNAME, ACCESS_KEY)
+
+browsers = [{"platform": "Mac OS X 10.9",
+             "browserName": "chrome",
+             "version": "31"},
+            {"platform": "Windows 8.1",
+             "browserName": "internet explorer",
+             "version": "11"}]
+
+
+def on_platforms(platforms):
+    def decorator(base_class):
+        module = sys.modules[base_class.__module__].__dict__
+        for i, platform in enumerate(platforms):
+            d = dict(base_class.__dict__)
+            d['desired_capabilities'] = platform
+            name = "%s_%s" % (base_class.__name__, i + 1)
+            module[name] = new.classobj(name, (base_class,), d)
+    return decorator
+
+
+@on_platforms(browsers)
 class PlatoTestCase(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Chrome()
-        self.addCleanup(self.driver.quit)
+        self.desired_capabilities['name'] = self.id()
+        sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
+        self.driver = webdriver.Remote(
+            desired_capabilities=self.desired_capabilities,
+            command_executor=sauce_url % (USERNAME, ACCESS_KEY)
+        )
+        self.driver.implicitly_wait(30)
+        #self.driver = webdriver.Chrome()
         self.site_url =  "http://plato.yoavram.com" # "file:///D:/workspace/curveball_project/plato/index.html" #        
 
 
@@ -63,7 +94,14 @@ class PlatoTestCase(unittest.TestCase):
 
 
     def tearDown(self):        
-        self.driver.close()    
+        print("Link to your job: https://saucelabs.com/jobs/%s" % self.driver.session_id)
+        try:
+            if sys.exc_info() == (None, None, None):
+                sauce.jobs.update_job(self.driver.session_id, passed=True)
+            else:
+                sauce.jobs.update_job(self.driver.session_id, passed=False)
+        finally:
+            self.driver.quit()
 
 
 if __name__ == "__main__":
