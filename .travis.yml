@@ -1,0 +1,7 @@
+deploy:
+  provider: divshot
+  api_key:
+    secure: P2M83qhW+kG1uBil1HJFXL2KXvgpekxyWflrPielBhQdb5avYJDWtSvCnyE8ktbBuNg0uvRvaiCBo3mQAlrTjZRLC38PFeAcWmWFAjdTGGHtp0kMDbngf54zbZcPOyLkOxUFoMUV5Tbi2v1UYhY9utRK0gRz0LZiQUha1SGP1gQ=
+  environment: production
+  on:
+    repo: yoavram/plato
