@@ -195,18 +195,24 @@ URL: https://github.com/yoavram/Plato
 			spinner.spin(document.getElementById('spinner'));
 			Papa.parse(window.event.target.files[0], {
 				header: true,
-				complete: function(results) {
+				complete: function(results) {					
 					$scope.strains = [];
+					var header = results.meta.fields;
+					var varnames = header.filter(function(field) { return ['Row','Col','Color'].indexOf(field) == -1; });
+					if (varnames.length == 0) {
+						// TODO error
+					}
+					$scope.varname = varnames[0];					
 					for (k = 0; k < results.data.length; k++) {
 						var row = results.data[k];
-						var strain = {name: row["Strain"], color: row["Color"]};
+						var strain = {name: row[$scope.varname], color: row["Color"]};
 						if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
 							$scope.strains[$scope.strains.length] = strain;
 						}
 						var tblSet = $scope.datatable.getSettings();
 						var i = tblSet.rowHeaders.indexOf(row["Row"]);
 						var j = tblSet.colHeaders.indexOf(row["Col"]);
-						$scope.datatable.setDataAtCell(i, j, row["Strain"]);
+						$scope.datatable.setDataAtCell(i, j, row[$scope.varname]);
 					}
 					$scope.$apply();
 					spinner.stop();
