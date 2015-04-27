@@ -27,15 +27,18 @@ URL: https://github.com/yoavram/Plato
 		margin-top: 10px;
 	}
 	.columns {
-		margin: 10px;
+		margin: 10px;		
 	}
-	.input-strain[type="text"] {
+	.input-strain[type="text"], .input-varname[type="text"] {
 		width: 2.5em;
 		height: 1.5em;
 		text-align: center;
 		font-weight: bold;
 		font-size: 110%;
 		padding: 0;
+	}
+	.input-varname[type="text"] {
+		width: 4.5em;		
 	}
 	a:link, a:visited {
 		color: #333;
@@ -69,7 +72,7 @@ URL: https://github.com/yoavram/Plato
 		<!-- Button -->
 		<div class="columns">
 			<div class="one-third column">
-				<div class="btn-group">
+				<div class="btn-group">					
 					<button class="btn tooltipped tooltipped-s" type="button" onclick="angular.element(this).scope().download()" aria-label="Download plate file">
 						<span class="octicon octicon-arrow-down"></span>
 					</button>
@@ -90,9 +93,12 @@ URL: https://github.com/yoavram/Plato
 		<div id="table" class="columns handsontable"></div>
 
 		<!-- Color palette -->
-		<div class="columns">
-			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
+		<div class="columns">			
+			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change variable value">
 				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().datatable.render()">
+			</div>
+			<div class="column tooltipped tooltipped-s" aria-label="Variable name">
+				<input type="text" class="input-contrast input-varname" ng-model="varname">
 			</div>
 		</div>
 
@@ -118,13 +124,13 @@ URL: https://github.com/yoavram/Plato
 
 	<script>
 	var data = [["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","6"],
-								["1","1","2","2","3","3","4","4","5","5","6","0"],
-								["1","1","2","2","3","3","4","4","5","5","6","0"]];
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","6"],
+				["1","1","2","2","3","3","4","4","5","5","6","0"],
+				["1","1","2","2","3","3","4","4","5","5","6","0"]];
 
 	// Angular
 	var app = angular.module('plateApp', []);
@@ -133,6 +139,7 @@ URL: https://github.com/yoavram/Plato
 		// Color palette
 
 		$scope.pal = palette('cb-Set1', 9);
+		$scope.varname = "Strain";
 		$scope.strains = [{name: '0', color: '#ffffff'}];
 		$scope.pal.forEach(function(c,i) {
 			$scope.strains[$scope.strains.length] = {name: (i+1).toString(), color: '#' + c};
@@ -170,10 +177,10 @@ URL: https://github.com/yoavram/Plato
 			data.forEach(function(row, i) {
 				row.forEach(function(value, j) {
 					dataframe[dataframe.length] = { Row: $scope.datatable.getRowHeader(i),
-																					Col: $scope.datatable.getColHeader(j),
-																					Strain: value,
-																					Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
-																				};
+													Col: $scope.datatable.getColHeader(j),
+													Strain: value,
+													Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+												};
 				});
 			});
 			var csv = Papa.unparse(dataframe);
