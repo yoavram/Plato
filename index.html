@@ -176,11 +176,12 @@ URL: https://github.com/yoavram/Plato
 			var dataframe = [];
 			data.forEach(function(row, i) {
 				row.forEach(function(value, j) {
-					dataframe[dataframe.length] = { Row: $scope.datatable.getRowHeader(i),
-													Col: $scope.datatable.getColHeader(j),
-													Strain: value,
-													Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
-												};
+					var record = { 	Row: $scope.datatable.getRowHeader(i),
+									Col: $scope.datatable.getColHeader(j),								
+									Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+								};
+					record[$scope.varname] = value; // var can't be used as key in the above def so need to use this line
+					dataframe[dataframe.length] = record;
 				});
 			});
 			var csv = Papa.unparse(dataframe);
