@@ -1,3 +1,4 @@
 {
-  "name": "plato-ui"
+  "name": "plato-ui",
+  "root": "src"
 }
