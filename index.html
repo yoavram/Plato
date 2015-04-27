@@ -38,7 +38,9 @@ URL: https://github.com/yoavram/Plato
 		padding: 0;
 	}
 	.input-varname[type="text"] {
-		width: 4.5em;		
+		text-align: left;
+		width: 4.5em;
+		padding: 0.33em;
 	}
 	a:link, a:visited {
 		color: #333;
@@ -98,7 +100,7 @@ URL: https://github.com/yoavram/Plato
 				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().datatable.render()">
 			</div>
 			<div class="column tooltipped tooltipped-s" aria-label="Variable name">
-				<input type="text" class="input-contrast input-varname" ng-model="varname">
+				<input type="text" class="input-contrast input-varname" ng-model="varname" autosize>
 			</div>
 		</div>
 
@@ -231,6 +233,10 @@ URL: https://github.com/yoavram/Plato
 		}
 	});
 	</script>
+
+	<!-- Autosize -->	
+	<script src="https://cdn.rawgit.com/mbenford/8016984/raw/9eb9c2e03395bd1eb68cf51583d9b736443b247a/autosize.js"></script>
+
 	<!-- Spinner -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
 	<script>
@@ -243,6 +249,7 @@ URL: https://github.com/yoavram/Plato
 		  };
 		  var spinner = new Spinner(spinnerOpts);
 	</script>
+
 	<!-- Google Analytics -->
 	<script>
 	if (window.location.origin == 'http://plato.yoavram.com') {
