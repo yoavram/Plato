@@ -57,7 +57,7 @@ class PlatoTestCase(unittest.TestCase):
                 command_executor=sauce_url % (USERNAME, ACCESS_KEY)
             )
             self.driver.implicitly_wait(30)
-            self.site_url = "http://plato.yoavram.com" # TODO change to staging?
+            self.site_url = "http://localhost:8080" 
         else:
             self.driver = webdriver.Chrome()
             self.site_url =  "file:///D:/workspace/curveball_project/plato/index.html" # 
