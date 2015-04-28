@@ -39,7 +39,7 @@ def on_platforms(desired_capabilities):
         for i, cap in enumerate(desired_capabilities):
             d = dict(base_class.__dict__)
             if CONTINUOUS_INTEGRATION:
-                cap['tunner-identifier'] = TRAVIS_JOB_NUMBER
+                cap['tunnel-identifier'] = TRAVIS_JOB_NUMBER
             d['desired_capabilities'] = cap
             name = "%s_%s" % (base_class.__name__, i + 1)
             module[name] = new.classobj(name, (base_class,), d)
@@ -60,7 +60,7 @@ class PlatoTestCase(unittest.TestCase):
             self.site_url = "http://localhost:8080" 
         else:
             self.driver = webdriver.Chrome()
-            self.site_url =  "file:///D:/workspace/curveball_project/plato/index.html" # 
+            self.site_url =  "file:///D:/workspace/curveball_project/plato/index.html"
 
 
     def test_github_link(self):
