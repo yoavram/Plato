@@ -4,14 +4,20 @@ import sys
 import new
 
 from selenium import webdriver
-from sauceclient import SauceClient
+#from sauceclient import SauceClient
 
-USERNAME = os.environ.get('SAUCE_USERNAME')
-ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
-assert USERNAME, "No SauceLabs USERNAME"
-assert ACCESS_KEY, "No SauceLabs ACCESS_KEY"
+CONTINUOUS_INTEGRATION = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
+if CONTINUOUS_INTEGRATION:
+    print "Running in CI"
+else:
+    print "Running local"
 
-sauce = SauceClient(USERNAME, ACCESS_KEY)
+if CONTINUOUS_INTEGRATION:
+    USERNAME = os.environ.get('SAUCE_USERNAME')
+    ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
+    assert USERNAME, "No SauceLabs USERNAME"
+    assert ACCESS_KEY, "No SauceLabs ACCESS_KEY"
+    sauce = SauceClient(USERNAME, ACCESS_KEY)
 
 browsers = [{"platform": "Mac OS X 10.9",
              "browserName": "chrome",
@@ -32,18 +38,21 @@ def on_platforms(platforms):
     return decorator
 
 
-@on_platforms(browsers)
+#@on_platforms(browsers) # TODO turn on for CI
 class PlatoTestCase(unittest.TestCase):
     def setUp(self):
-        self.desired_capabilities['name'] = self.id()
-        sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
-        self.driver = webdriver.Remote(
-            desired_capabilities=self.desired_capabilities,
-            command_executor=sauce_url % (USERNAME, ACCESS_KEY)
-        )
-        self.driver.implicitly_wait(30)
-        #self.driver = webdriver.Chrome()
-        self.site_url =  "http://plato.yoavram.com" # "file:///D:/workspace/curveball_project/plato/index.html" #        
+        if CONTINUOUS_INTEGRATION:
+            self.desired_capabilities['name'] = self.id()
+            sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
+            self.driver = webdriver.Remote(
+                desired_capabilities=self.desired_capabilities,
+                command_executor=sauce_url % (USERNAME, ACCESS_KEY)
+            )
+            self.driver.implicitly_wait(30)
+            self.site_url = "http://plato.yoavram.com" # TODO change to staging?
+        else:
+            self.driver = webdriver.Chrome()
+            self.site_url =  "file:///D:/workspace/curveball_project/plato/index.html" # 
 
 
     def test_github_link(self):
@@ -96,14 +105,17 @@ class PlatoTestCase(unittest.TestCase):
     #     assert test_div.text == plate_text, tet_div.text
 
 
-    def tearDown(self):        
-        print("Link to your job: https://saucelabs.com/jobs/%s" % self.driver.session_id)
-        try:
-            if sys.exc_info() == (None, None, None):
-                sauce.jobs.update_job(self.driver.session_id, passed=True)
-            else:
-                sauce.jobs.update_job(self.driver.session_id, passed=False)
-        finally:
+    def tearDown(self):
+        if CONTINUOUS_INTEGRATION:
+            print("Link to your job: https://saucelabs.com/jobs/%s" % self.driver.session_id)
+            try:
+                if sys.exc_info() == (None, None, None):
+                    sauce.jobs.update_job(self.driver.session_id, passed=True)
+                else:
+                    sauce.jobs.update_job(self.driver.session_id, passed=False)
+            finally:
+                self.driver.quit()
+        else:
             self.driver.quit()
 
 
