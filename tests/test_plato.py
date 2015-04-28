@@ -23,28 +23,30 @@ if CONTINUOUS_INTEGRATION:
     sauce = SauceClient(USERNAME, ACCESS_KEY)
 
 if CONTINUOUS_INTEGRATION:
-    browsers = [{"platform": "Mac OS X 10.9",
+    desired_capabilities = [{"platform": "Mac OS X 10.9",
              "browserName": "chrome",
              "version": "31"},
             {"platform": "Windows 8.1",
              "browserName": "internet explorer",
              "version": "11"}]
 else:
-    browsers = [{"browserName": "chrome"}]        
+    desired_capabilities = [{"browserName": "chrome"}]        
 
 
-def on_platforms(platforms):
+def on_platforms(desired_capabilities):
     def decorator(base_class):
         module = sys.modules[base_class.__module__].__dict__
-        for i, platform in enumerate(platforms):
+        for i, cap in enumerate(desired_capabilities):
             d = dict(base_class.__dict__)
-            d['desired_capabilities'] = platform
+            if CONTINUOUS_INTEGRATION:
+                cap['tunner-identifier'] = TRAVIS_JOB_NUMBER
+            d['desired_capabilities'] = cap
             name = "%s_%s" % (base_class.__name__, i + 1)
             module[name] = new.classobj(name, (base_class,), d)
     return decorator
 
 
-@on_platforms(browsers)
+@on_platforms(desired_capabilities)
 class PlatoTestCase(unittest.TestCase):
     def setUp(self):
         if CONTINUOUS_INTEGRATION:
@@ -52,8 +54,7 @@ class PlatoTestCase(unittest.TestCase):
             sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
             self.driver = webdriver.Remote(
                 desired_capabilities=self.desired_capabilities,
-                command_executor=sauce_url % (USERNAME, ACCESS_KEY),
-                tunner_identifier=TRAVIS_JOB_NUMBER,
+                command_executor=sauce_url % (USERNAME, ACCESS_KEY)
             )
             self.driver.implicitly_wait(30)
             self.site_url = "http://plato.yoavram.com" # TODO change to staging?
