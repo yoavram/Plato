@@ -4,7 +4,7 @@ import sys
 import new
 
 from selenium import webdriver
-#from sauceclient import SauceClient
+
 
 CONTINUOUS_INTEGRATION = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 if CONTINUOUS_INTEGRATION:
@@ -15,8 +15,11 @@ else:
 if CONTINUOUS_INTEGRATION:
     USERNAME = os.environ.get('SAUCE_USERNAME')
     ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
+    TRAVIS_JOB_NUMBER = os.environ.get('TRAVIS_JOB_NUMBER')
     assert USERNAME, "No SauceLabs USERNAME"
     assert ACCESS_KEY, "No SauceLabs ACCESS_KEY"
+    assert TRAVIS_JOB_NUMBER, "No Travis Job Number"
+    from sauceclient import SauceClient
     sauce = SauceClient(USERNAME, ACCESS_KEY)
 
 if CONTINUOUS_INTEGRATION:
@@ -49,7 +52,8 @@ class PlatoTestCase(unittest.TestCase):
             sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
             self.driver = webdriver.Remote(
                 desired_capabilities=self.desired_capabilities,
-                command_executor=sauce_url % (USERNAME, ACCESS_KEY)
+                command_executor=sauce_url % (USERNAME, ACCESS_KEY),
+                tunner_identifier=TRAVIS_JOB_NUMBER,
             )
             self.driver.implicitly_wait(30)
             self.site_url = "http://plato.yoavram.com" # TODO change to staging?
