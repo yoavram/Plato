@@ -79,7 +79,7 @@ class PlatoTestCase(unittest.TestCase):
         assert container != None
         upload_file = driver.find_element_by_id("upload-file")
         assert upload_file != None
-        upload_file.send_keys(os.getcwd() + r"\tests\empty.csv")
+        upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
         strains = driver.find_elements_by_class_name('input-strain')
         assert len(strains) == 1, len(strains)
         strain = strains[0]
@@ -108,9 +108,9 @@ class PlatoTestCase(unittest.TestCase):
         x.send();""" % href        
         driver.execute_script(script)
         test_div = driver.find_element_by_id('test')
-        with open("tests/plate.csv") as f:
+        with open(os.path.join(os.getcwd(), "tests", "plate.csv")) as f:
             plate_text = f.read()
-        assert test_div.text == plate_text, tet_div.text
+        assert test_div.text == plate_text, test_div.text
 
 
     def tearDown(self):
