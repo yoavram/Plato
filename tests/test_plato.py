@@ -19,12 +19,15 @@ if CONTINUOUS_INTEGRATION:
     assert ACCESS_KEY, "No SauceLabs ACCESS_KEY"
     sauce = SauceClient(USERNAME, ACCESS_KEY)
 
-browsers = [{"platform": "Mac OS X 10.9",
+if CONTINUOUS_INTEGRATION:
+    browsers = [{"platform": "Mac OS X 10.9",
              "browserName": "chrome",
              "version": "31"},
             {"platform": "Windows 8.1",
              "browserName": "internet explorer",
              "version": "11"}]
+else:
+    browsers = [{"browserName": "chrome"}]        
 
 
 def on_platforms(platforms):
@@ -38,7 +41,7 @@ def on_platforms(platforms):
     return decorator
 
 
-#@on_platforms(browsers) # TODO turn on for CI
+@on_platforms(browsers)
 class PlatoTestCase(unittest.TestCase):
     def setUp(self):
         if CONTINUOUS_INTEGRATION:
