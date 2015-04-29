@@ -111,6 +111,7 @@ class PlatoTestCase(unittest.TestCase):
         test_div = driver.find_element_by_id('test')
         with open(os.path.join(os.getcwd(), "tests", "plate.csv")) as f:
             plate_text = f.read()
+        assert len(test_div.text) == len(plate_text), len(test_div.text)
         assert test_div.text == plate_text, test_div.text
 
 
