@@ -79,6 +79,7 @@ class PlatoTestCase(unittest.TestCase):
         assert container != None
         upload_file = driver.find_element_by_id("upload-file")
         assert upload_file != None
+        driver.execute_script("arguments[0].style.display='inline';", upload_file) # make input visible so IE can interact with it
         upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
         strains = driver.find_elements_by_class_name('input-strain')
         assert len(strains) == 1, len(strains)
