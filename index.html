@@ -27,15 +27,20 @@ URL: https://github.com/yoavram/Plato
 		margin-top: 10px;
 	}
 	.columns {
-		margin: 10px;
+		margin: 10px;		
 	}
-	.input-strain[type="text"] {
+	.input-strain[type="text"], .input-varname[type="text"] {
 		width: 2.5em;
 		height: 1.5em;
 		text-align: center;
 		font-weight: bold;
 		font-size: 110%;
 		padding: 0;
+	}
+	.input-varname[type="text"] {
+		text-align: left;
+		width: 4.5em;
+		padding: 0.33em;
 	}
 	a:link, a:visited {
 		color: #333;
@@ -69,7 +74,7 @@ URL: https://github.com/yoavram/Plato
 		<!-- Button -->
 		<div class="columns">
 			<div class="one-third column">
-				<div class="btn-group">
+				<div class="btn-group">					
 					<button class="btn tooltipped tooltipped-s" type="button" onclick="angular.element(this).scope().download()" aria-label="Download plate file">
 						<span class="octicon octicon-arrow-down"></span>
 					</button>
@@ -90,9 +95,12 @@ URL: https://github.com/yoavram/Plato
 		<div id="table" class="columns handsontable"></div>
 
 		<!-- Color palette -->
-		<div class="columns">
-			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change strain name">
-				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().datatable.render()">
+		<div class="columns">			
+			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change variable value">
+				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().checkNoDuplicates() && angular.element(this).scope().datatable.render()">
+			</div>
+			<div class="column tooltipped tooltipped-s" aria-label="Variable name">
+				<input type="text" class="input-contrast input-varname" ng-model="varname" autosize>
 			</div>
 		</div>
 
@@ -107,6 +115,9 @@ URL: https://github.com/yoavram/Plato
 						yoavram
 					</a>
 				</h6>
+			</div>
+			<div class="column">
+				<span class="state state-closed" ng-hide="noDuplicates"><h4>Duplicate values</h4></span>
 			</div>
 		</div>
 
@@ -133,10 +144,31 @@ URL: https://github.com/yoavram/Plato
 		// Color palette
 
 		$scope.pal = palette('cb-Set1', 9);
+		$scope.varname = "Strain";
 		$scope.strains = [{name: '0', color: '#ffffff'}];
 		$scope.pal.forEach(function(c,i) {
 			$scope.strains[$scope.strains.length] = {name: (i+1).toString(), color: '#' + c};
 		})
+		$scope.noDuplicates = true;
+
+		$scope.checkNoDuplicates = function() {			
+			var set = new Set();
+			for (k=0; k < $scope.strains.length; k++) {
+				var strain = $scope.strains[k];
+				if (set.has(strain.name)) {					
+					$scope.$apply(function () {
+						$scope.noDuplicates = false;
+					});
+					return false;
+				} else {
+					set.add(strain.name);
+				}
+			}			
+			$scope.$apply(function () {
+				$scope.noDuplicates = true;
+			});
+			return true;
+		}
 
 		// Handsontable
 
@@ -169,11 +201,12 @@ URL: https://github.com/yoavram/Plato
 			var dataframe = [];
 			data.forEach(function(row, i) {
 				row.forEach(function(value, j) {
-					dataframe[dataframe.length] = { Row: $scope.datatable.getRowHeader(i),
-													Col: $scope.datatable.getColHeader(j),
-													Strain: value,
-													Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+					var record = { 	Row: $scope.datatable.getRowHeader(i),
+									Col: $scope.datatable.getColHeader(j),								
+									Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
 					};
+					record[$scope.varname] = value; // var can't be used as key in the above def so need to use this line
+					dataframe[dataframe.length] = record;
 				});
 			});
 			var csv = Papa.unparse(dataframe);
@@ -187,18 +220,24 @@ URL: https://github.com/yoavram/Plato
 			spinner.spin(document.getElementById('spinner'));
 			Papa.parse(window.event.target.files[0], {
 				header: true,
-				complete: function(results) {
+				complete: function(results) {					
 					$scope.strains = [];
+					var header = results.meta.fields;
+					var varnames = header.filter(function(field) { return ['Row','Col','Color'].indexOf(field) == -1; });
+					if (varnames.length == 0) {
+						console.log("Error: varnames.length is zero");
+					}
+					$scope.varname = varnames[0];					
 					for (k = 0; k < results.data.length; k++) {
 						var row = results.data[k];
-						var strain = {name: row["Strain"], color: row["Color"]};
+						var strain = {name: row[$scope.varname], color: row["Color"]};
 						if ($scope.strains.filter(function(obj) { return obj.name == strain.name }).length == 0) {
 							$scope.strains[$scope.strains.length] = strain;
 						}
 						var tblSet = $scope.datatable.getSettings();
 						var i = tblSet.rowHeaders.indexOf(row["Row"]);
 						var j = tblSet.colHeaders.indexOf(row["Col"]);
-						$scope.datatable.setDataAtCell(i, j, row["Strain"]);
+						$scope.datatable.setDataAtCell(i, j, row[$scope.varname]);
 					}
 					$scope.$apply();
 					spinner.stop();
@@ -217,6 +256,10 @@ URL: https://github.com/yoavram/Plato
 		}
 	});
 	</script>
+
+	<!-- Autosize -->	
+	<script src="https://cdn.rawgit.com/mbenford/8016984/raw/9eb9c2e03395bd1eb68cf51583d9b736443b247a/autosize.js"></script>
+
 	<!-- Spinner -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
 	<script>
@@ -229,6 +272,7 @@ URL: https://github.com/yoavram/Plato
 		};
 		var spinner = new Spinner(spinnerOpts);
 	</script>
+
 	<!-- Google Analytics -->
 	<script>
 	if (window.location.origin == 'http://plato.yoavram.com') {
