@@ -9,7 +9,8 @@ Open the app at <http://plato.yoavram.com/> or run locally by downloading `index
 
 ## Acknowledgments
 
-[Brian Connelly](https://github.com/briandconnelly) for suggestions and testing
+- [Brian Connelly](https://github.com/briandconnelly) for suggestions and testing.
+- [BrowserStack](http://www.browserstack.com), a cross-browser testing tool on a cloud infrastructure of desktop and mobile browsers.
 
 ## License
 
