@@ -29,22 +29,22 @@ if CONTINUOUS_INTEGRATION:
             "platform": "Windows 7",
             "browserName": "chrome",
             "version": "40.0"
-            },
-            {
-            "platform": "OS X 10.10",
-            "browserName": "safari",
-            "version": "8.0"
-            },
-            {
-            "platform": "Windows 8.1",
-            "browserName": "internet explorer",
-            "version": "11.0"
-            },
-            {
-            "platform": "Linux",
-            "browserName": "firefox",
-            "version": "37.0"
-            }
+            }#,
+            # {
+            # "platform": "OS X 10.10",
+            # "browserName": "safari",
+            # "version": "8.0"
+            # },
+            # {
+            # "platform": "Windows 8.1",
+            # "browserName": "internet explorer",
+            # "version": "11.0"
+            # },
+            # {
+            # "platform": "Linux",
+            # "browserName": "firefox",
+            # "version": "37.0"
+            # }
             ]
 else:
     desired_capabilities = [{"browserName": "chrome"}]        
