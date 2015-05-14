@@ -27,7 +27,7 @@ Testing is currently only done on Windows 7 with latest Chrome (but see issue #6
 
 - [Brian Connelly](https://github.com/briandconnelly) for suggestions and testing
 - [BrowserStack](http://www.browserstack.com), a cross-browser testing tool on a cloud infrastructure of desktop and mobile browsers. Used for manual testing on other platforms and browsers.
-- [Tavis](https://travis-ci.org/yoavram/Plato) and [SauceLabs](https://saucelabs.com) used for continuous integration and automatic testing.
+- [Travis](https://travis-ci.org/yoavram/Plato) and [SauceLabs](https://saucelabs.com) used for continuous integration and automatic testing.
 
 ## License
 
