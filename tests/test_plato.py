@@ -28,18 +28,23 @@ if CONTINUOUS_INTEGRATION:
             {
             "platform": "Windows 7",
             "browserName": "chrome",
-            "version": "41"
-            }#,
-            # {
-            # "platform": "Mac OS X 10.9",
-            # "browserName": "chrome",
-            # "version": "31"
-            # },
-            # {
-            # "platform": "Windows 8.1",
-            # "browserName": "internet explorer",
-            # "version": "11"
-            # }
+            "version": "37"
+            },
+            {
+            "platform": "OS X Yosemite",
+            "browserName": "Safari",
+            "version": "8"
+            },
+            {
+            "platform": "Windows 8.1",
+            "browserName": "Internet Explorer",
+            "version": "11"
+            },
+            {
+            "platform": "Linux",
+            "browserName": "Firefox",
+            "version": "32"
+            }
             ]
 else:
     desired_capabilities = [{"browserName": "chrome"}]        
