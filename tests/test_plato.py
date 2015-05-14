@@ -28,22 +28,22 @@ if CONTINUOUS_INTEGRATION:
             {
             "platform": "Windows 7",
             "browserName": "chrome",
-            "version": "37"
+            "version": "40.0"
             },
             {
-            "platform": "OS X Yosemite",
-            "browserName": "Safari",
-            "version": "8"
+            "platform": "OS X 10.10",
+            "browserName": "safari",
+            "version": "8.0"
             },
             {
             "platform": "Windows 8.1",
-            "browserName": "Internet Explorer",
-            "version": "11"
+            "browserName": "internet explorer",
+            "version": "11.0"
             },
             {
             "platform": "Linux",
-            "browserName": "Firefox",
-            "version": "32"
+            "browserName": "firefox",
+            "version": "37.0"
             }
             ]
 else:
