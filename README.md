@@ -1,6 +1,6 @@
-<<<<<<< HEAD
 # Plato
-![Plato](https://raw.githubusercontent.com/yoavram/plato/master/plato.png)
+![Plato](https://raw.githubusercontent.com/yoavram/plato/master/public/plato.png)
+[![Build Status](https://travis-ci.org/yoavram/Plato.svg?branch=master)](https://travis-ci.org/yoavram/Plato)
 
 A tiny web app to design microplates and download them as a dataframe CSV.
 
@@ -21,10 +21,13 @@ and [Selenium Chromedriver](https://sites.google.com/a/chromium.org/chromedriver
 6. Start a local web server in the `public` folder: `cd public & python -m SimpleHTTPServer 8080`
 6. Run the tests: `nosetests`.
 
+Testing is currently only done on Windows 7 with latest Chrome (but see issue #6).
+
 ## Acknowledgments
 
 - [Brian Connelly](https://github.com/briandconnelly) for suggestions and testing
-- [BrowserStack](http://www.browserstack.com), a cross-browser testing tool on a cloud infrastructure of desktop and mobile browsers.
+- [BrowserStack](http://www.browserstack.com), a cross-browser testing tool on a cloud infrastructure of desktop and mobile browsers. Used for manual testing on other platforms and browsers.
+- [Tavis](https://travis-ci.org/yoavram/Plato) and [SauceLabs](https://saucelabs.com) used for continuous integration and automatic testing.
 
 ## License
 
