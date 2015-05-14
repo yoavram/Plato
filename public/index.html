@@ -108,7 +108,7 @@ URL: https://github.com/yoavram/Plato
 		<div class="columns colophon">
 			<div class="column">
 				<h6>
-					<a href="https://github.com/yoavram/Plato" target="_blank" >
+					<a href="https://github.com/yoavram/Plato" target="_blank" name="github">
 						<span class="octicon octicon-mark-github"></span>
 					</a>
 					<a href="http://www.yoavram.com" target="_blank">
@@ -209,8 +209,9 @@ URL: https://github.com/yoavram/Plato
 					dataframe[dataframe.length] = record;
 				});
 			});
-			var csv = Papa.unparse(dataframe);
-			var url = URL.createObjectURL( new Blob([csv], {type: "text/csv"}) );
+			var csv = Papa.unparse(dataframe);			
+			var blob = new Blob([csv], {type: "text/csv"});
+			var url = URL.createObjectURL(blob);			
 			var btn = document.getElementById('btnDownload');
 			btn.href = url;
 			btn.click();
