@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Plato
 ![Plato](https://raw.githubusercontent.com/yoavram/plato/master/plato.png)
 
@@ -17,11 +18,13 @@ and [Selenium Chromedriver](https://sites.google.com/a/chromium.org/chromedriver
 3. Activate the virtualenv: Windows - `venv\scripts\activate`; Linux - `source venv/bin/activate`.
 4. Install the requirements: `pip install -r requirements.txt`.
 5. Get the Chromedriver for Selenium if you didn't already. See link above.
+6. Start a local web server in the `public` folder: `cd public & python -m SimpleHTTPServer 8080`
 6. Run the tests: `nosetests`.
 
 ## Acknowledgments
 
-[Brian Connelly](https://github.com/briandconnelly) for suggestions and testing
+- [Brian Connelly](https://github.com/briandconnelly) for suggestions and testing
+- [BrowserStack](http://www.browserstack.com), a cross-browser testing tool on a cloud infrastructure of desktop and mobile browsers.
 
 ## License
 
