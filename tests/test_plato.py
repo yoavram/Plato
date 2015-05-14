@@ -21,7 +21,7 @@ if CONTINUOUS_INTEGRATION:
     from sauceclient import SauceClient
     sauce = SauceClient(USERNAME, ACCESS_KEY)
     port = int(os.environ.get('PORT', 8080))
-    assert port == 3474, port
+
 
 if CONTINUOUS_INTEGRATION:
     desired_capabilities = [
