@@ -58,6 +58,16 @@ def on_platforms(desired_capabilities):
     return decorator
 
 
+def compare_csv(text1, text2):
+    text1 = text1.replace('\r', '')
+    text2 = text2.replace('\r', '')
+    rows1 = text1.split('\n')
+    rows2 = text2.split('\n')
+    cells1 = [row.split(',') for row in rows1]
+    cells2 = [row.split(',') for row in rows2]
+    return cells1 == cells2
+
+
 @on_platforms(desired_capabilities)
 class PlatoTestCase(unittest.TestCase):
     def setUp(self):
@@ -75,29 +85,29 @@ class PlatoTestCase(unittest.TestCase):
             self.site_url =  "file:///D:/workspace/curveball_project/plato/public/index.html"
 
 
-    def test_github_link(self):
-        driver = self.driver        
-        driver.get(self.site_url)
-        self.assertTrue("Plato" in driver.title)
-        driver.find_element_by_class_name("octicon-mark-github").click()
-        self.assertTrue("github.com" in driver.page_source)
+    # def test_github_link(self):
+    #     driver = self.driver        
+    #     driver.get(self.site_url)
+    #     self.assertTrue("Plato" in driver.title)
+    #     driver.find_element_by_class_name("octicon-mark-github").click()
+    #     self.assertTrue("github.com" in driver.page_source)
 
 
-    def test_upload(self):
-        driver = self.driver        
-        driver.get(self.site_url)
-        self.assertTrue("Plato" in driver.title)
-        container = driver.find_element_by_class_name('container')
-        assert container != None
-        upload_file = driver.find_element_by_id("upload-file")
-        assert upload_file != None
-        driver.execute_script("arguments[0].style.display='inline';", upload_file) # make input visible so IE can interact with it
-        upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
-        strains = driver.find_elements_by_class_name('input-strain')
-        assert len(strains) == 1, len(strains)
-        strain = strains[0]
-        assert strain.get_attribute('value') == '0', strain.get_attribute('value')
-        assert strain.get_attribute('style') == 'background: rgb(255, 255, 255);', strain.get_attribute('style')
+    # def test_upload(self):
+    #     driver = self.driver        
+    #     driver.get(self.site_url)
+    #     self.assertTrue("Plato" in driver.title)
+    #     container = driver.find_element_by_class_name('container')
+    #     assert container != None
+    #     upload_file = driver.find_element_by_id("upload-file")
+    #     assert upload_file != None
+    #     driver.execute_script("arguments[0].style.display='inline';", upload_file) # make input visible so IE can interact with it
+    #     upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
+    #     strains = driver.find_elements_by_class_name('input-strain')
+    #     assert len(strains) == 1, len(strains)
+    #     strain = strains[0]
+    #     assert strain.get_attribute('value') == '0', strain.get_attribute('value')
+    #     assert strain.get_attribute('style') == 'background: rgb(255, 255, 255);', strain.get_attribute('style')
         
 
     def test_download(self):
@@ -121,10 +131,12 @@ class PlatoTestCase(unittest.TestCase):
         x.send();""" % href        
         driver.execute_script(script)
         test_div = driver.find_element_by_id('test')
-        with open(os.path.join(os.getcwd(), "tests", "plate.csv")) as f:
+        test_text = test_div.text
+        with open(os.path.join(os.getcwd(), "tests", "plate.csv"), "rb") as f:
             plate_text = f.read()
-        assert len(test_div.text) == len(plate_text), len(test_div.text)
-        assert test_div.text == plate_text, test_div.text
+
+        compare = compare_csv(plate_text, test_text)
+        assert compare, "Test text and expected text are not the same!"
 
 
     def tearDown(self):
