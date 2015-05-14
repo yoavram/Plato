@@ -85,29 +85,29 @@ class PlatoTestCase(unittest.TestCase):
             self.site_url =  "file:///D:/workspace/curveball_project/plato/public/index.html"
 
 
-    # def test_github_link(self):
-    #     driver = self.driver        
-    #     driver.get(self.site_url)
-    #     self.assertTrue("Plato" in driver.title)
-    #     driver.find_element_by_class_name("octicon-mark-github").click()
-    #     self.assertTrue("github.com" in driver.page_source)
+    def test_github_link(self):
+        driver = self.driver        
+        driver.get(self.site_url)
+        self.assertTrue("Plato" in driver.title)
+        driver.find_element_by_class_name("octicon-mark-github").click()
+        self.assertTrue("github.com" in driver.page_source)
 
 
-    # def test_upload(self):
-    #     driver = self.driver        
-    #     driver.get(self.site_url)
-    #     self.assertTrue("Plato" in driver.title)
-    #     container = driver.find_element_by_class_name('container')
-    #     assert container != None
-    #     upload_file = driver.find_element_by_id("upload-file")
-    #     assert upload_file != None
-    #     driver.execute_script("arguments[0].style.display='inline';", upload_file) # make input visible so IE can interact with it
-    #     upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
-    #     strains = driver.find_elements_by_class_name('input-strain')
-    #     assert len(strains) == 1, len(strains)
-    #     strain = strains[0]
-    #     assert strain.get_attribute('value') == '0', strain.get_attribute('value')
-    #     assert strain.get_attribute('style') == 'background: rgb(255, 255, 255);', strain.get_attribute('style')
+    def test_upload(self):
+        driver = self.driver        
+        driver.get(self.site_url)
+        self.assertTrue("Plato" in driver.title)
+        container = driver.find_element_by_class_name('container')
+        assert container != None
+        upload_file = driver.find_element_by_id("upload-file")
+        assert upload_file != None
+        driver.execute_script("arguments[0].style.display='inline';", upload_file) # make input visible so IE can interact with it
+        upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
+        strains = driver.find_elements_by_class_name('input-strain')
+        assert len(strains) == 1, len(strains)
+        strain = strains[0]
+        assert strain.get_attribute('value') == '0', strain.get_attribute('value')
+        assert strain.get_attribute('style') == 'background: rgb(255, 255, 255);', strain.get_attribute('style')
         
 
     def test_download(self):
