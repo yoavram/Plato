@@ -60,7 +60,7 @@ class PlatoTestCase(unittest.TestCase):
             self.site_url = "http://localhost:8080" 
         else:
             self.driver = webdriver.Chrome()
-            self.site_url =  "file:///D:/workspace/curveball_project/plato/index.html"
+            self.site_url =  "file:///D:/workspace/curveball_project/plato/public/index.html"
 
 
     def test_github_link(self):
