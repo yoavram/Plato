@@ -109,7 +109,7 @@ class PlatoTestCase(unittest.TestCase):
         driver.execute_script("arguments[0].style.display='inline';", upload_file) # make input visible so IE can interact with it
         upload_file.send_keys(os.path.join(os.getcwd(), "tests", "empty.csv"))
         strains = driver.find_elements_by_class_name('input-strain')
-        assert len(strains) == 1, len(strains)
+        assert len(strains) == 2, len(strains)
         strain = strains[0]
         assert strain.get_attribute('value') == '0', strain.get_attribute('value')
         assert strain.get_attribute('style') == 'background: rgb(255, 255, 255);', strain.get_attribute('style')
@@ -118,13 +118,20 @@ class PlatoTestCase(unittest.TestCase):
     def test_download(self):
         driver = self.driver
         driver.get(self.site_url)
+        # change one cell to empty string
+        app = driver.find_element_by_id("app")
+        script = """var scope = angular.element(arguments[0]).scope();
+        scope.datatable.setDataAtCell(0,0,'');"""
+        driver.execute_script(script, app)
+        # click download button
         btn = driver.find_element_by_class_name('octicon-arrow-down')
         assert btn != None
         btn.click()
+        # get href of the download
         btn_download = self.driver.find_element_by_id('btnDownload')
         assert btn_download != None
         href = btn_download.get_attribute('href')
-        
+        # use ajax to get the download and put it in a div
         script = """var x = new XMLHttpRequest();
         x.onload = function() {
             var div = document.createElement('div');
@@ -135,13 +142,22 @@ class PlatoTestCase(unittest.TestCase):
         x.open('get', '%s');
         x.send();""" % href        
         driver.execute_script(script)
+        # read download from div and compare to expected result
         test_div = driver.find_element_by_id('test')
         test_text = test_div.text
         with open(os.path.join(os.getcwd(), "tests", "plate.csv"), "rb") as f:
             plate_text = f.read()
-
         compare = compare_csv(plate_text, test_text)
         assert compare, "Test text and expected text are not the same!"
+
+
+    def test_clear(self):
+        driver = self.driver
+        driver.get(self.site_url)
+        btn = driver.find_element_by_class_name('octicon-x')
+        assert btn != None
+        btn.click()
+        # TODO
 
 
     def tearDown(self):

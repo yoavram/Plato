@@ -62,7 +62,7 @@ URL: https://github.com/yoavram/Plato
 	</style>
 </head>
 <body>
-	<div class="container" ng-app="plateApp" ng-controller="plateCtrl" >
+	<div class="container" ng-app="plateApp" ng-controller="plateCtrl" id="app">
 		<span id="spinner"></span>
 
 		<!-- Title -->
@@ -81,8 +81,8 @@ URL: https://github.com/yoavram/Plato
 					<button class="btn tooltipped tooltipped-s"  type="button" ng-show="checkFileApi()" onclick="document.getElementById('upload-file').click();" aria-label="Upload plate file">
 						<span class="octicon octicon-arrow-up"></span>
 					</button>
-					<button class="btn tooltipped tooltipped-s" type="button" onclick="location.reload()" aria-label="Restart">
-						<span class="octicon octicon-sync"></span>
+					<button class="btn tooltipped tooltipped-s" type="button" onclick="angular.element(this).scope().clear()" aria-label="Clear">
+						<span class="octicon octicon-x"></span>
 					</button>
 					<a class="btn tooltipped tooltipped-e" target="_blank" role="button" href="http://i.imgur.com/5zPmGQf.gifv" aria-label="Drunk on fermented apples">
 						<span class="octicon octicon-squirrel"></span>
@@ -97,7 +97,8 @@ URL: https://github.com/yoavram/Plato
 		<!-- Color palette -->
 		<div class="columns">			
 			<div class="column tooltipped tooltipped-s" ng-repeat="strain in strains" aria-label="Change variable value">
-				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" onchange="angular.element(this).scope().checkNoDuplicates() && angular.element(this).scope().datatable.render()">
+				<input class="input-strain" type="text" ng-model="strain.name" style="background:{{ strain.color }}" ng-show="strain.name != ''"
+				onchange="angular.element(this).scope().checkNoDuplicates() && angular.element(this).scope().datatable.render()">
 			</div>
 			<div class="column tooltipped tooltipped-s" aria-label="Variable name">
 				<input type="text" class="input-contrast input-varname" ng-model="varname" autosize>
@@ -149,6 +150,7 @@ URL: https://github.com/yoavram/Plato
 		$scope.pal.forEach(function(c,i) {
 			$scope.strains[$scope.strains.length] = {name: (i+1).toString(), color: '#' + c};
 		})
+		$scope.strains[$scope.strains.length] = {name: '', color: '#1E1E1E'};
 		$scope.noDuplicates = true;
 
 		$scope.checkNoDuplicates = function() {			
@@ -195,18 +197,30 @@ URL: https://github.com/yoavram/Plato
 			renderer: $scope.colorRenderer
 		});
 
+		$scope.clear = function() {
+			console.log('clear');
+			data.forEach(function(row, i) {
+				row.forEach(function(value, j) {
+					data[i][j] = '';
+				});
+			});
+			$scope.datatable.render();
+		}
+
 		// Files
 
 		$scope.download = function() {
 			var dataframe = [];
 			data.forEach(function(row, i) {
 				row.forEach(function(value, j) {
-					var record = { 	Row: $scope.datatable.getRowHeader(i),
-									Col: $scope.datatable.getColHeader(j),								
-									Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
-					};
-					record[$scope.varname] = value; // var can't be used as key in the above def so need to use this line
-					dataframe[dataframe.length] = record;
+					if (value != '') {
+						var record = { 	Row: $scope.datatable.getRowHeader(i),
+										Col: $scope.datatable.getColHeader(j),								
+										Color: $scope.strains.filter(function(obj) {return obj.name == value})[0].color
+						};
+						record[$scope.varname] = value; // var can't be used as key in the above def so need to use this line
+						dataframe[dataframe.length] = record;
+					}
 				});
 			});
 			var csv = Papa.unparse(dataframe);			
@@ -218,6 +232,7 @@ URL: https://github.com/yoavram/Plato
 		}
 
 		$scope.upload = function () {
+			// TODO clear before upload?
 			spinner.spin(document.getElementById('spinner'));
 			Papa.parse(window.event.target.files[0], {
 				header: true,
@@ -240,7 +255,8 @@ URL: https://github.com/yoavram/Plato
 						var j = tblSet.colHeaders.indexOf(row["Col"]);
 						$scope.datatable.setDataAtCell(i, j, row[$scope.varname]);
 					}
-					$scope.$apply();
+					$scope.strains[$scope.strains.length] = {name: '', color: '#1E1E1E'};
+					$scope.$apply(); // TODO not the proper way to use apply
 					spinner.stop();
 				}
 			});
