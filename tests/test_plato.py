@@ -150,6 +150,15 @@ class PlatoTestCase(unittest.TestCase):
         assert compare, "Test text and expected text are not the same!"
 
 
+    def test_clear(self):
+        driver = self.driver
+        driver.get(self.site_url)
+        btn = driver.find_element_by_class_name('octicon-x')
+        assert btn != None
+        btn.click()
+        # TODO
+
+
     def tearDown(self):
         if CONTINUOUS_INTEGRATION:
             print("Link to your job: https://saucelabs.com/jobs/%s" % self.driver.session_id)
