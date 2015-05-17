@@ -1,6 +1,7 @@
 # Plato
-![Plato](https://raw.githubusercontent.com/yoavram/plato/master/public/plato.png)
 [![Build Status](https://travis-ci.org/yoavram/Plato.svg?branch=master)](https://travis-ci.org/yoavram/Plato)
+
+![Plato](https://raw.githubusercontent.com/yoavram/plato/master/public/plato.png)
 
 A tiny web app to design microplates and download them as a dataframe CSV.
 
