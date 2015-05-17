@@ -1,17 +1,19 @@
 language: python
-
-python: "2.7"
-
-install: 
-  - pip install -r requirements.txt
-
-addons: 
+python: '2.7'
+install:
+- pip install -r requirements.txt
+addons:
   sauce_connect: true
-
 before_script:
-  - cd public
-  - python -m SimpleHTTPServer 8080 2>&1 > /dev/null &
-  - cd ..
-
-script: 
-  - nosetests
+- cd public
+- python -m SimpleHTTPServer 8080 2>&1 > /dev/null &
+- cd ..
+script:
+- nosetests
+deploy:
+  provider: divshot
+  api_key:
+    secure: RkJFEr+8NrUrVVaR51xxRoIPOkS5+6PHUdYWzc8k58DdgiUC8YyOqXtdd3dyU3CjYqJw8qEp8X9HGGqm6DjxlxJLkfvXBPJNHNxM02TtnEot5SIZYvQjeJGvbVhQQKKtHqhszPQkd1yuBbvmEteR+BCH0BILKsrbGX/+HkGoFKE=
+  environment: production
+  on:
+    repo: yoavram/Plato
