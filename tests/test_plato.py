@@ -118,13 +118,19 @@ class PlatoTestCase(unittest.TestCase):
     def test_download(self):
         driver = self.driver
         driver.get(self.site_url)
+        # change one cell to empty string
+        script = """var scope = angular.element($('#app')).scope();
+        scope.datatable.setDataAtCell(0,0,'');"""
+        driver.execute_script(script)
+        # click download button
         btn = driver.find_element_by_class_name('octicon-arrow-down')
         assert btn != None
         btn.click()
+        # get href of the download
         btn_download = self.driver.find_element_by_id('btnDownload')
         assert btn_download != None
         href = btn_download.get_attribute('href')
-        
+        # use ajax to get the download and put it in a div
         script = """var x = new XMLHttpRequest();
         x.onload = function() {
             var div = document.createElement('div');
@@ -135,11 +141,11 @@ class PlatoTestCase(unittest.TestCase):
         x.open('get', '%s');
         x.send();""" % href        
         driver.execute_script(script)
+        # read download from div and compare to expected result
         test_div = driver.find_element_by_id('test')
         test_text = test_div.text
         with open(os.path.join(os.getcwd(), "tests", "plate.csv"), "rb") as f:
             plate_text = f.read()
-
         compare = compare_csv(plate_text, test_text)
         assert compare, "Test text and expected text are not the same!"
 
