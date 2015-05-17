@@ -199,11 +199,12 @@ URL: https://github.com/yoavram/Plato
 
 		$scope.clear = function() {
 			console.log('clear');
-			for (i=0; i < $scope.datatable.maxRows; i++ ) {
-				for (j=0; j < $scope.datatable.maxCols; j++ ) {
-					$scope.datatable.setDataAtCell(i, j, "");
-				}
-			}			
+			data.forEach(function(row, i) {
+				row.forEach(function(value, j) {
+					data[i][j] = '';
+				});
+			});
+			$scope.datatable.render();
 		}
 
 		// Files
