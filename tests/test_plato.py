@@ -40,11 +40,11 @@ if CONTINUOUS_INTEGRATION:
         # "browserName": "internet explorer",
         # "version": "11.0"
         # },
-        {
-            "platform": "Linux",
-            "browserName": "firefox",
-            "version": "37.0"
-        }
+        # {
+        #     "platform": "Linux",
+        #     "browserName": "firefox",
+        #     "version": "37.0"
+        # }
     ]
 else:
     desired_capabilities = [{"browserName": "chrome"}]        
