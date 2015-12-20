@@ -30,7 +30,7 @@ Testing is currently only done on Windows 7 with latest Chrome (but see issue #6
 - [BrowserStack](http://www.browserstack.com) for manual testing on other platforms and browsers.
 - [Travis](https://travis-ci.org/yoavram/Plato) for continuous integration, testing and deployment.
 - [SauceLabs](https://saucelabs.com) for automatic testing.
-- [Divshot](https://divshot.com/) for web hosting.
+- [Surge](https://surge.sh/) for web hosting.
 
 ## License
 
