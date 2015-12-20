@@ -10,10 +10,12 @@ before_script:
 - cd ..
 script:
 - nosetests
+after_success:
+  - npm install -g surge
 deploy:
-  provider: divshot
-  api_key:
-    secure: RkJFEr+8NrUrVVaR51xxRoIPOkS5+6PHUdYWzc8k58DdgiUC8YyOqXtdd3dyU3CjYqJw8qEp8X9HGGqm6DjxlxJLkfvXBPJNHNxM02TtnEot5SIZYvQjeJGvbVhQQKKtHqhszPQkd1yuBbvmEteR+BCH0BILKsrbGX/+HkGoFKE=
-  environment: production
+  provider: script
+  script: surge public
   on:
     repo: yoavram/Plato
+    branch: master
+  skip_cleanup: true
