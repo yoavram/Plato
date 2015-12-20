@@ -234,7 +234,7 @@ URL: https://github.com/yoavram/Plato
 		$scope.upload = function () {
 			// TODO clear before upload?
 			spinner.spin(document.getElementById('spinner'));
-			Papa.parse(window.event.target.files[0], {
+			Papa.parse(document.getElementById('upload-file').files[0], {
 				header: true,
 				complete: function(results) {					
 					$scope.strains = [];
